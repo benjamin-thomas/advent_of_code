@@ -1,2 +1,4 @@
 if-then-else=k-r
 break-cases=all
+break-infix =fit-or-vertical # break every pipes if overflows line max
+# m = 50
