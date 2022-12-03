@@ -1,1 +1,6 @@
+# Ocaml
 _build/
+
+# Haskell
+dist-newstyle/
+.hie/
