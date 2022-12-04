@@ -3,6 +3,7 @@ module Day01 where
 import Control.Arrow ((>>>))
 import Data.List (sort)
 import Data.List.Split (splitOn)
+import Debug.Trace (trace)
 import Prelude hiding ((>>))
 
 {-
@@ -65,12 +66,22 @@ greatestSum = head . (reverse . sort) . map sum
 (>>) :: (t1 -> t2) -> (t2 -> t3) -> t1 -> t3
 (>>) f g x = g (f x)
 
+debug :: Show a => a -> a
+debug x =
+    trace ("==> DEBUG: " ++ show x) x
+
 {- |
->>> top3Calories [[1,2], [4], [5], [9], [2,1]]
+>>> top3Calories [[1,2], [4], [5], [9], [2,1]] -- 9 + 5 + 4 = 18
 18
 -}
 top3Calories :: [[Integer]] -> Integer
-top3Calories = map sum >>> sort >>> reverse >>> take 3 >>> sum
+top3Calories =
+    map sum
+        >>> sort
+        >>> reverse
+        >>> take 3
+        -- >>> debug
+        >>> sum
 
 {-
     Previous iterations, keeping for ref:
