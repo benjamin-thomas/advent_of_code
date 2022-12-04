@@ -40,11 +40,10 @@ let%test_unit _ =
 (* Public API *)
 
 (* Find the Elf carrying the most Calories. How many total Calories is that Elf carrying? *)
-let most_calories input = from_input input |> greatest_sum
+let most_calories input = input |> greatest_sum
 
 (* Find the total Calories carried by the top three Elves carrying the most Calories *)
 let top3_calories input =
-  let calories = from_input input in
-  match sort_by_sum calories with
+  match sort_by_sum input with
   | a :: b :: c :: _ -> sum [ a; b; c ]
-  | _ -> failwith "invalid input"
+  | _ -> raise @@ Invalid_argument "List must contain at least 3 elements"
