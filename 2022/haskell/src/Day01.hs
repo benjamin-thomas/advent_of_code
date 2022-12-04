@@ -46,14 +46,6 @@ fromInput input =
 greatestSum :: [[Integer]] -> Integer
 greatestSum = head . (reverse . sort) . map sum
 
--- Same as: Prelude.(.)
-(<<) :: (t1 -> t2) -> (t3 -> t1) -> t3 -> t2
-(<<) f g x = f (g x)
-
--- Same as: Control.Arrow.(>>>)
-(>>) :: (t1 -> t2) -> (t2 -> t3) -> t1 -> t3
-(>>) f g x = g (f x)
-
 {- |
 >>> sort [3,1,2]
 [1,2,3]
@@ -64,6 +56,14 @@ greatestSum = head . (reverse . sort) . map sum
 >>> sort >> reverse $ [3,1,2]
 [3,2,1]
 -}
+
+-- Same as: Prelude.(.)
+(<<) :: (t1 -> t2) -> (t3 -> t1) -> t3 -> t2
+(<<) f g x = f (g x)
+
+-- Same as: Control.Arrow.(>>>)
+(>>) :: (t1 -> t2) -> (t2 -> t3) -> t1 -> t3
+(>>) f g x = g (f x)
 
 {- |
 >>> top3Calories [[1,2], [4], [5], [9], [2,1]]
