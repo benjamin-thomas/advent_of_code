@@ -11,6 +11,42 @@ import Test exposing (..)
 -}
 
 
+explore : Test
+explore =
+    concat <|
+        List.indexedMap (\i exp -> test ("explore" ++ String.fromInt i) <| exp)
+            [ \_ ->
+                Just 2 |> Maybe.map ((*) 2) |> Expect.equal (Just 4)
+            , \_ ->
+                Nothing |> Maybe.map ((*) 2) |> Expect.equal Nothing
+            , \_ ->
+                Ok 2 |> Result.map ((*) 2) |> Expect.equal (Ok 4)
+            , \_ ->
+                Err "oops" |> Result.map ((*) 2) |> Expect.equal (Err "oops")
+            , \_ ->
+                Expect.equal [ Just 2, Nothing, Just 6 ] <|
+                    ([ Just 1, Nothing, Just 3 ] |> List.map (Maybe.map ((*) 2)))
+            , \_ ->
+                Expect.equal [ Nothing ] <|
+                    ([ Nothing ] |> List.map (Maybe.map ((*) 2)))
+            , \_ ->
+                Expect.equal (Just [ 1, 2, 3 ]) <|
+                    List.foldr (Maybe.map2 (\h t -> h :: t)) (Just []) [ Just 1, Just 2, Just 3 ]
+            , \_ ->
+                Expect.equal (Just [ 1, 2, 3 ]) <|
+                    List.foldr (Maybe.map2 (::)) (Just []) [ Just 1, Just 2, Just 3 ]
+            , \_ ->
+                Expect.equal Nothing <|
+                    List.foldr (Maybe.map2 (::)) (Just []) [ Just 1, Nothing, Just 3 ]
+            , \_ ->
+                Expect.equal (Ok [ 1, 2, 3 ]) <|
+                    List.foldr (Result.map2 (::)) (Ok []) [ Ok 1, Ok 2, Ok 3 ]
+            , \_ ->
+                Expect.equal (Err "foo") <|
+                    List.foldr (Result.map2 (::)) (Ok []) [ Ok 1, Err "foo", Err "bar" ]
+            ]
+
+
 fromInput : String -> List Int
 fromInput str =
     str
