@@ -1,4 +1,5 @@
 (* Option.map2 is built into Base *)
+
 let%test_unit _ =
   let open Base in
   [%test_eq: int list option] (Some [ 1; 2; 3 ])
@@ -28,19 +29,20 @@ let%test_unit _ =
 let%test_unit _ =
   expect_result (Error "oops") @@ compute1 [ Ok 1; Error "oops"; Ok 3 ]
 
-let result_and_then f ra rb =
+let then_apply f ra rb =
   let open Base in
   ra |> Result.bind ~f:(fun x -> Result.map ~f:(fun y -> f x y) rb)
 
 let compute2 (lst : (int, 'a) Result.t list) =
   let open Base in
-  List.fold_right ~f:(result_and_then List.cons) ~init:(Ok []) lst
+  List.fold_right ~f:(then_apply List.cons) ~init:(Ok []) lst
 
 let%test_unit _ =
   expect_result (Ok [ 1; 2; 3 ]) @@ compute2 [ Ok 1; Ok 2; Ok 3 ]
 
 let%test_unit _ =
-  expect_result (Error "oops") @@ compute2 [ Ok 1; Error "oops"; Ok 3 ]
+  expect_result (Error "oops")
+  @@ compute2 [ Ok 1; Error "oops"; Error "oops2"; Ok 4 ]
 
 let compute3 (lst : (int, string) Result.t list) =
   let open Base in
@@ -56,4 +58,5 @@ let%test_unit _ =
   expect_result (Ok [ 1; 2; 3 ]) @@ compute3 [ Ok 1; Ok 2; Ok 3 ]
 
 let%test_unit _ =
-  expect_result (Error "oops") @@ compute3 [ Ok 1; Error "oops"; Ok 3 ]
+  expect_result (Error "oops")
+  @@ compute3 [ Ok 1; Error "oops"; Error "oops2"; Ok 4 ]

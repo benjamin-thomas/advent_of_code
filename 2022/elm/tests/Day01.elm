@@ -16,15 +16,29 @@ compute1 =
     List.foldr (Result.map2 (::)) (Ok [])
 
 
-compute2 : List (Result error a) -> Result error (List a)
-compute2 res =
-    res
-        |> List.foldl
-            (\x acc ->
-                acc |> Result.andThen (\lst -> Result.map (\h -> h :: lst) x)
-            )
-            (Ok [])
-        |> Result.map List.reverse
+compute2a : List (Result error a) -> Result error (List a)
+compute2a =
+    List.foldl
+        (\ra rb ->
+            rb |> Result.andThen (\y -> ra |> Result.map (\x -> x :: y))
+        )
+        (Ok [])
+        >> Result.map List.reverse
+
+
+thenApply : (a -> b -> c) -> Result x a -> Result x b -> Result x c
+thenApply f ra rb =
+    ra |> Result.andThen (\x -> rb |> Result.map (\y -> f x y))
+
+
+compute2b : List (Result error a) -> Result error (List a)
+compute2b =
+    List.foldr (thenApply (::)) (Ok [])
+
+
+compute2c : List (Result error a) -> Result error (List a)
+compute2c =
+    List.foldr (\ra rb -> ra |> Result.andThen (\x -> rb |> Result.map (\y -> x :: y))) (Ok [])
 
 
 explore : Test
@@ -59,13 +73,25 @@ explore =
                     compute1 [ Ok 1, Ok 2, Ok 3 ]
             , \_ ->
                 Expect.equal (Err "foo") <|
-                    compute1 [ Ok 1, Err "foo", Err "bar" ]
+                    compute1 [ Ok 1, Err "foo", Err "bar10" ]
             , \_ ->
                 Expect.equal (Ok [ 1, 2, 3 ]) <|
-                    compute2 [ Ok 1, Ok 2, Ok 3 ]
+                    compute2a [ Ok 1, Ok 2, Ok 3 ]
             , \_ ->
                 Expect.equal (Err "foo") <|
-                    compute2 [ Ok 1, Err "foo", Err "bar" ]
+                    compute2a [ Ok 1, Err "foo", Err "bar12", Ok 4 ]
+            , \_ ->
+                Expect.equal (Ok [ 1, 2, 3 ]) <|
+                    compute2b [ Ok 1, Ok 2, Ok 3 ]
+            , \_ ->
+                Expect.equal (Err "foo") <|
+                    compute2b [ Ok 1, Err "foo", Err "bar14" ]
+            , \_ ->
+                Expect.equal (Ok [ 1, 2, 3 ]) <|
+                    compute2c [ Ok 1, Ok 2, Ok 3 ]
+            , \_ ->
+                Expect.equal (Err "foo") <|
+                    compute2c [ Ok 1, Err "foo", Err "bar16", Ok 4 ]
             ]
 
 
