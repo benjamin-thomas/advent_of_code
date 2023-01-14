@@ -1,3 +1,5 @@
+use std::num::ParseIntError;
+
 pub fn from_input(input: &str) -> Vec<u32> {
     return input
         .split("\n\n")
@@ -18,9 +20,31 @@ pub fn top3_calories(calories: Vec<u32>) -> u32 {
     res.iter().sum()
 }
 
+#[allow(dead_code)]
+fn parse_data(s: Vec<&str>) -> Result<Vec<isize>, ParseIntError> {
+    s.iter().map(|item| item.parse()).collect()
+}
+
+#[allow(dead_code)]
+fn compute(lst: Vec<Result<isize, &str>>) -> Result<Vec<isize>, &str> {
+    lst.iter().map(|item| item.to_owned()).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_compute() {
+        assert_eq!(Ok(vec![1, 2, 3]), compute(vec![Ok(1), Ok(2), Ok(3)]));
+        assert_eq!(Err("oops"), compute(vec![Ok(1), Err("oops"), Ok(3)]));
+    }
+
+    #[test]
+    fn test_parse_data() {
+        assert_eq!(Ok(vec![1, 2, 3]), parse_data(vec!["1", "2", "3"]));
+        assert!(parse_data(vec!["1", "2a", "3"]).is_err())
+    }
 
     #[test]
     fn test_from_input() {
