@@ -70,6 +70,8 @@ let compute4 =
 *)
 let then_apply3 f ra rb =
   let open Base.Result.Monad_infix in
+  (* let ( >>= ) = Result.bind in *)
+  (* let ( >>| ) r f = Result.map f r in *)
   ra >>= fun x ->
   rb >>| fun y -> f x y
 
