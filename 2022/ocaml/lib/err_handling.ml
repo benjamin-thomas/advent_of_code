@@ -86,6 +86,17 @@ let compute5 =
   let open Base in
   List.fold_right ~f:(then_apply3 List.cons) ~init:(Ok [])
 
+let then_apply4 f ra rb =
+  let ( let* ) = Result.bind in
+  let ( let+ ) r f = Result.map f r in
+  let* x = ra in
+  let+ y = rb in
+  f x y
+
+let compute6 =
+  let open Base in
+  List.fold_right ~f:(then_apply4 List.cons) ~init:(Ok [])
+
 let%test_unit _ =
   expect_result (Ok [ 1; 2; 3 ]) @@ compute3 [ Ok 1; Ok 2; Ok 3 ]
 
@@ -106,3 +117,10 @@ let%test_unit _ =
 let%test_unit _ =
   expect_result (Error "oops")
   @@ compute5 [ Ok 1; Error "oops"; Error "oops2"; Ok 4 ]
+
+let%test_unit _ =
+  expect_result (Ok [ 1; 2; 3 ]) @@ compute6 [ Ok 1; Ok 2; Ok 3 ]
+
+let%test_unit _ =
+  expect_result (Error "oops")
+  @@ compute6 [ Ok 1; Error "oops"; Error "oops2"; Ok 4 ]
