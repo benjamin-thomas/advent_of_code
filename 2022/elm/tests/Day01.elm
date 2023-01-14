@@ -11,6 +11,22 @@ import Test exposing (..)
 -}
 
 
+compute1 : List (Result error a) -> Result error (List a)
+compute1 =
+    List.foldr (Result.map2 (::)) (Ok [])
+
+
+compute2 : List (Result error a) -> Result error (List a)
+compute2 res =
+    res
+        |> List.foldl
+            (\x acc ->
+                acc |> Result.andThen (\lst -> Result.map (\h -> h :: lst) x)
+            )
+            (Ok [])
+        |> Result.map List.reverse
+
+
 explore : Test
 explore =
     concat <|
@@ -40,10 +56,16 @@ explore =
                     List.foldr (Maybe.map2 (::)) (Just []) [ Just 1, Nothing, Just 3 ]
             , \_ ->
                 Expect.equal (Ok [ 1, 2, 3 ]) <|
-                    List.foldr (Result.map2 (::)) (Ok []) [ Ok 1, Ok 2, Ok 3 ]
+                    compute1 [ Ok 1, Ok 2, Ok 3 ]
             , \_ ->
                 Expect.equal (Err "foo") <|
-                    List.foldr (Result.map2 (::)) (Ok []) [ Ok 1, Err "foo", Err "bar" ]
+                    compute1 [ Ok 1, Err "foo", Err "bar" ]
+            , \_ ->
+                Expect.equal (Ok [ 1, 2, 3 ]) <|
+                    compute2 [ Ok 1, Ok 2, Ok 3 ]
+            , \_ ->
+                Expect.equal (Err "foo") <|
+                    compute2 [ Ok 1, Err "foo", Err "bar" ]
             ]
 
 
