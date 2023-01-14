@@ -29,6 +29,7 @@ let%test_unit _ =
 let%test_unit _ =
   expect_result (Error "oops") @@ compute1 [ Ok 1; Error "oops"; Ok 3 ]
 
+(* NOTE: `then_apply` is result_map2! *)
 let then_apply f ra rb =
   let open Base in
   ra |> Result.bind ~f:(fun x -> Result.map ~f:(fun y -> f x y) rb)

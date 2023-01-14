@@ -26,6 +26,8 @@ compute2a =
         >> Result.map List.reverse
 
 
+{-| NOTE: `thenApply` is Result.map2!
+-}
 thenApply : (a -> b -> c) -> Result x a -> Result x b -> Result x c
 thenApply f ra rb =
     ra |> Result.andThen (\x -> rb |> Result.map (\y -> f x y))
