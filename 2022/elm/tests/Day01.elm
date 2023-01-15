@@ -43,6 +43,27 @@ compute2c =
     List.foldr (\ra rb -> ra |> Result.andThen (\x -> rb |> Result.map (\y -> x :: y))) (Ok [])
 
 
+
+-- expectEqual : expected -> expected -> actual -> Expect.Expectation
+
+
+expectEqual : String -> a -> a -> Test
+expectEqual descr want got =
+    test descr (\_ -> Expect.equal want got)
+
+
+errHandlingSuite : Test
+errHandlingSuite =
+    describe "Error handling"
+        [ expectEqual "valid input"
+            (Ok 2)
+            (String.toInt "1" |> Result.fromMaybe ":(" |> Result.map ((*) 2))
+        , expectEqual "invalid input"
+            (Err ":(")
+            (String.toInt "1x" |> Result.fromMaybe ":(" |> Result.map ((*) 2))
+        ]
+
+
 explore : Test
 explore =
     concat <|
